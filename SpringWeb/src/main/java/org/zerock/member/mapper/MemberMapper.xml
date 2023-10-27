@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.zerock.member.mapper.MemberMapper">
+	<!-- 회원가입 -->
+	<insert id="join" parameterType="org.zerock.member.command.MemberVO">
+		insert into member(id, pw, name) values(#{id}, #{pw}, #{name})
+	</insert>
+	<!-- 인서트는 원래 반환 값이 인트라서 그냥 사용가능하지만 셀렉트는 -->
+	
+	<!-- id 확인 -->
+	<select id="idCheck" resultType="int">
+		select count(*) as result from member where id=#{id}
+		<!-- count를 쓰는 이유는 int 값으로 가져오기 위해서 사용함 -->
+	</select>
+	
+	<!-- 로그인 -->
+	<select id="login" parameterType="org.zerock.member.command.MemberVO" resultType="int">
+		select count(*) as result from member where id=#{id} and pw=#{pw} 
+	</select>
+	<!-- 셀렉트는 반환 값이 result set이다 반환 값을 int로 받으려면 select 한 값이 int여야 하기 때문에 count로 했고 반환 값도 int라고 적어준 것 -->
+</mapper>

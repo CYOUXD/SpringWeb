@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="org.zerock.board.mapper.BoardMapper">
+	
+	<!-- 게시물 목록 보기 -->
+	<select id="getList" resultType="org.zerock.board.command.BoardVO">
+		select * from tbl_board order by num desc
+	</select>
+	
+	<!-- 게시물 등록 -->
+	<insert id="insertBoard"><!-- 파라미터 값을 생략하면 자동으로 지정된다 -->
+		insert into tbl_board(num, title, content, writer, regdate, updatedate)
+		values(tbl_board_seq.nextval, #{title}, #{content}, #{writer}, sysdate, sysdate)
+	</insert>
+	
+	<!-- 게시물 상세 보기 -->
+	<select id="getContent" parameterType="java.lang.String" resultType="org.zerock.board.command.BoardVO">
+		select * from tbl_board where num=#{num}
+	</select>
+	
+	<!-- 게시물 업데이트 -->
+	<update id="updateBoard" parameterType="org.zerock.board.command.BoardVO" keyProperty="true"><!-- keyProperty = 반환 타입을 true로 지정 -->
+		update tbl_board set 
+			title=#{title}, 
+			content=#{content}, 
+			writer=#{writer},
+			updatedate=sysdate
+		where num=#{num}
+	</update>
+	
+	<!-- 게시물 삭제 -->
+	<delete id="deleteBoard" parameterType="java.lang.String">
+		delete from tbl_board where num=#{num}
+	</delete>
+	
+	<!-- 페이징 -->
+	<!-- total - 게시물 총 수 -->
+	<select id="getTotal" resultType="int">
+		select count(*) from tbl_board
+	</select>
+	<!-- 페이징 쿼리 : 특정 페이지 항목에 대한 게시물을 불러오기 위함 -->
+	<select id="pagingList" resultType="org.zerock.board.command.BoardVO" parameterType="org.zerock.board.command.Criteria">
+		select * from 
+			(select rownum as rnum, B.* from 
+				(select * from tbl_board order by num desc) B  <!-- B 앞에 as 생략 -->
+			where rownum &lt;=#{pageEnd}) 
+		where #{pageStart} &lt;=rnum
+		<!-- B.* : B로 만들어진 테이블 내부의 전체 -->
+		<!-- #{}안에 있는 값은 getter, setter로 가져오는 것이다. 여기의 #{는} getPageEnd, getPageStart이다. "%lt;" = "<" -->
+	</select>
+	
+</mapper>
